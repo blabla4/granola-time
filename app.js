@@ -4,28 +4,66 @@ $("#search").on("input", function() {
   search($("#search").val());
 });
 
-function playlistManager() {
+addControls();
+
+function playNext() {
   if(playlist.length) {
-    play("todo", playlist[0]);
+    play(playlist[0][1], playlist[0][0]);
     playlist.splice(0,1);
   }
+  playlistManager();
 }
 
-function play(title,id) {
+function playlistManager() {
+  if($("#list").children().length) {
+    $("#list").empty();
+  }
+  playlist.forEach(function(video) {
+    $("<li/>", {text: video[1]}).appendTo("#list");
+  });
+}
+
+function play(title, id) {
   $("#video").remove();
-  $("#player").text(title);
+  $("#title").text(title);
   var video = $("<video/>", {id:"video", autoplay:"true"}).appendTo(document.body);
   video.hide();
   $("<source/>", {type:"video/mp4", src:"http://localhost:8000/play/"+id}).appendTo(video);
   video.on("ended", function() {
-    playlistManager();
+    playNext();
+  });
+  video.on("timeupdate", function() {
+    var percent = 100-Math.round((((this.duration - this.currentTime) / this.duration))*100);
+    $("#timebar").css("background", "linear-gradient(to right, rgb(100,100,100) "+percent+"%, rgb(40,40,40) "+percent+"%)");
   });
 }
 
-function addPlaylist(id) {
+function addControls() {
+  var playBtn = $("<button/>", {class: "controls-elt", text: "Play"}).appendTo("#controls");
+  playBtn.on("click",function(){
+    $("#video").get(0).play();
+  });
+  var pauseBtn = $("<button/>", {class: "controls-elt", text: "Pause"}).appendTo("#controls");
+  pauseBtn.on("click",function(){
+    $("#video").get(0).pause();
+  });
+  var timebar = $("<div/>", {id: "timebar", class:"controls-elt"}).appendTo("#controls");
+  timebar.css("background", "linear-gradient(to right, rgb(100,100,100) 0%, rgb(40,40,40) 0%)");
+  var playlistBtn = $("<button/>", {text: "Playlist"}).appendTo("#controls");
+  playlistBtn.on("click", function() {
+    if($("#playlist").is(":visible")) {
+      $("#playlist").hide();
+    } else {
+      $("#playlist").show();
+    }
+  });
+}
+
+function addPlaylist(title, id) {
   $("#add-btn-" + id).css("color", "rgb(100,100,100)");
   $("#add-btn-" + id).css("border", "2px solid rgb(100,100,100)");
-  playlist.push(id);
+  playlist.push([id, title]);
+  playlistManager();
 }
 
 function download(title, id) {
@@ -50,7 +88,7 @@ function showResults(results) {
       text: "+"
     }).appendTo(resultDiv);
     addBtn.on("click", function() {
-      addPlaylist(video.id);
+      addPlaylist(video.title, video.id);
     });
 
     var dlBtn = $("<button/>", {
