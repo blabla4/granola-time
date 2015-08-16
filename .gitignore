@@ -1,3 +1,6 @@
+# Properties
+*.properties
+
 # Logs
 logs
 *.log

@@ -1,0 +1,9 @@
+{
+  "name": "granola",
+  "version" : "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "ytdl-core": "latest",
+    "fluent-ffmpeg": "latest"
+  }
+}
