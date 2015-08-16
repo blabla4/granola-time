@@ -3,11 +3,12 @@ from apiclient.errors import HttpError
 from oauth2client.tools import argparser
 from flask import Flask
 from flask.ext.cors import CORS, cross_origin
+import os
 import json
 import ConfigParser
 
 config = ConfigParser.RawConfigParser()
-config.read("youtube.properties")
+config.read(os.path.dirname(os.path.abspath(__file__)) + "\\youtube.properties")
 DEVELOPER_KEY = config.get('YoutubeSection', 'youtube.key');
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
